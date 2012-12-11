@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,13 +27,15 @@ namespace AdminData.Tests
         [TestMethod]
         public void ParseFile()
         {
-            var path = "c:\\Code\\AdminData\\AdminData\\App_Data\\data.txt";
+            var path = "..\\..\\..\\AdminData\\App_Data\\data.txt";
+            File.Exists(path).Should().BeTrue("we need the test file to work");
+
             var reader = new HopperCountReader(path);
             var hopperCounts = reader.GetHopperCounts().ToArray();
             hopperCounts.Should().NotBeNull();
             hopperCounts.Should().NotBeEmpty();
             hopperCounts.First().ShouldBeEquivalentTo(ExpectedFirstRecord());
-            hopperCounts.Count().Should().Be(954);
+            hopperCounts.Count().Should().Be(File.ReadAllLines(path).Length - 1);
         }
 
         private static HopperCount ExpectedFirstRecord()
