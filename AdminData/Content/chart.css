@@ -1,0 +1,35 @@
+﻿body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line, .line2 {
+  fill: none;
+  stroke-width: 1.5px;
+}
+.line {
+    stroke: steelblue;
+}
+.line2 {
+    stroke: maroon;
+}
+.label1, .label2 {
+    stroke-width: .5px;
+    font-size: large;
+}
+.label1, .axis1 {
+    stroke: steelblue;
+}
+.label2, .axis2{
+    stroke: maroon;
+}
