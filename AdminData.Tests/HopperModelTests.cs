@@ -25,6 +25,16 @@ namespace AdminData.Tests
         }
 
         [TestMethod]
+        public void ToStringTest()
+        {
+
+            var line = "2012-12-05T17:00:00.0000000-08:00	186273	139562	106	0.057";
+            var reader = new HopperCountReader(string.Empty);
+            var actual = reader.ReadLine(line).ToString();
+            actual.Should().Be(line);
+        }
+
+        [TestMethod, Ignore]
         public void ParseFile()
         {
             var path = "..\\..\\..\\AdminData\\App_Data\\data.txt";

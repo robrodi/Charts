@@ -23,8 +23,8 @@ namespace AdminData.Controllers
         [OutputCache(Duration = 3600, VaryByParam = "none")]
         public ContentResult HopperTSV()
         {
-            var reader= new HopperCountReader(HostingEnvironment.MapPath(dataPath));
-            var content = reader.RawTSV();
+            //var reader= new HopperCountReader(HostingEnvironment.MapPath(dataPath));
+            var content = HopperCountReader.JunkTSV(5);
             return Content(content);
         }
     }
