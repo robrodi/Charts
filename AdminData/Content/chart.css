@@ -9,16 +9,8 @@
   shape-rendering: crispEdges;
 }
 
-.x.axis path {
-  display: none;
-}
-
 .line, .line2 {
-  fill: none;
   stroke-width: 1.5px;
-}
-.line3 {
-    fill: steelblue;
 }
 .line {
     stroke: steelblue;
@@ -37,8 +29,13 @@
     stroke: maroon;
 }
 
-path {
+path.line {
   fill: steelblue;
+}
+path.line2 {
+    fill: maroon;
+    stroke-opacity: .8;
+    fill-opacity: .5;
 }
 
 .axis path,
@@ -52,4 +49,7 @@ path {
   stroke: #fff;
   fill-opacity: .125;
   shape-rendering: crispEdges;
+}
+#Log {
+    display: none;
 }

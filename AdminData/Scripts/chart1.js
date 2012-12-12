@@ -4,7 +4,7 @@ var parseDate = d3.time.format("%Y-%m-%dT%H:%M").parse;
 var margin = { top: 10, right: 30, bottom: 100, left: 110 },
     margin2 = { top: 540, right: 30, bottom: 0, left: 110 },
     width = $(document).width() - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom,
+    height = 620 - margin.top - margin.bottom,
     height2 = 600 - margin2.top - margin2.bottom;
 
 var xAxisValue = function (d) { return x(d.date); };
@@ -16,34 +16,41 @@ var x2 = d3.time.scale().range([0, width]);
 
 var y = d3.scale.linear().range([height, 0]);
 var yAxis = d3.svg.axis().scale(y).orient("left");
-var line = d3.svg.line()
-    .x(xAxisValue)
-    .y(function (d) { return y(d.total); });
-
+var total = d3.svg.area()
+    .interpolate("monotone")
+    .x(function (d) { return x(d.date); })
+    .y0(height)
+    .y1(function (d) { return y(d.total); });
 // Time
 var xAxis = d3.svg.axis().scale(x).orient("bottom");
+var bottomXAxis = d3.svg.axis().scale(x2).orient("bottom");
 
 // % of fallback to ok users
 var y2 = d3.scale.linear().range([height, 0]);
 var yAxis2 = d3.svg.axis().scale(y2).orient('right');
-var ratioLine = d3.svg.line()
-    .x(xAxisValue)
-    .y(function (d) { return y2(d.ratio); });
+var ratioLine = d3.svg.area()
+    .interpolate("monotone")
+    .x(function (d) { return x(d.date); })
+    .y0(height)
+    .y1(function (d) { return y2(d.ratio); });
 
 // Bottom view
 var y3 = d3.scale.linear().range([height2, 0]);
 var yAxis3 = d3.svg.axis().scale(y3).orient('left');
-
-var bottomAsLine = d3.svg.line()
-    .x(function (d) { return x2(d.date); })
-    .y(function (d) { return y3(d.total); });
-
 
 var bottomAsArea = d3.svg.area()
     .interpolate("monotone")
     .x(function (d) { return x2(d.date); })
     .y0(height2)
     .y1(function (d) { return y3(d.total); });
+
+var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+var main = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var context = svg.append("g")
+       .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 var prepData = function (error, data) {
     data.forEach(function (d) {
@@ -64,12 +71,6 @@ var prepData = function (error, data) {
     y3.domain(d3.extent(data, function (d) { return d.total; }));
 
     x2.domain(x.domain());
- 
-    var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom);
-    var main = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     main.append("g")
             .attr("class", "x axis")
@@ -92,51 +93,56 @@ var prepData = function (error, data) {
         .text("Users")
         .attr('class', 'label1');
 
-    main.append("g")
-       .attr("class", "y axis 2 axis2")
-       .call(yAxis2)
-     .append("text")
-       .attr("x", -6)
-       .attr("y", height - 15)
-       .attr("dy", ".71em")
-       .style("text-anchor", "end")
-       .text("fallback %")
-        .attr('class', 'label2');
-
     main.append("path")
         .datum(data)
         .attr("class", "line")
-        .attr("d", line);
+        .attr("d", total);
+
+    main.append("g")
+     .attr("class", "y axis axis2")
+     .call(yAxis2)
+   .append("text")
+     .attr("x", -6)
+     .attr("y", height - 15)
+     .attr("dy", ".71em")
+     .style("text-anchor", "end")
+     .text("fallback %")
+      .attr('class', 'label2');
 
     main.append("path")
        .datum(data)
        .attr("class", "line2")
        .attr("d", ratioLine);
 
-    var context = svg.append("g")
-       .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-
-    // draw the line
+    // draw the bottom graph
     context.append("path")
      .datum(data)
-     .attr("class", "line3")
+     .attr("class", "line3 line")
      .attr("d", bottomAsArea);
 
     context.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height2 + ")")
-    .call(xAxis);
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height2 + ")")
+        .call(bottomXAxis);
 
     var brush = d3.svg.brush()
         .x(x2)
         .on("brush", brush);
 
+    // wire function when selecting in bottom graph
     function brush() {
+        // if nothing is selected, select the previous domain (x.domain) otherwise use how much is selected.
         var newDomain = brush.empty() ? x.domain() : brush.extent();
+
+        // redomain x to use this new range
         x.domain(newDomain);
         log(newDomain);
-        main.selectAll("path.line").attr("d", line);
+
+        // redraw the two lines, expanded to the domain
+        main.selectAll("path.line").attr("d", total);
         main.selectAll("path.line2").attr("d", ratioLine);
+
+        // redraw the top axis
         main.select(".x.axis").call(xAxis);
     }
 
