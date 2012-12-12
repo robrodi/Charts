@@ -96,6 +96,7 @@ var prepData = function (error, data) {
     main.append("path")
         .datum(data)
         .attr("class", "line")
+        .attr("clip-path", "url(#clip)")
         .attr("d", total);
 
     main.append("g")
@@ -112,6 +113,7 @@ var prepData = function (error, data) {
     main.append("path")
        .datum(data)
        .attr("class", "line2")
+       .attr("clip-path", "url(#clip)")
        .attr("d", ratioLine);
 
     // draw the bottom graph
