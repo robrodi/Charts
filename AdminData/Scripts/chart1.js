@@ -135,7 +135,8 @@ var prepData = function (error, data) {
         var newDomain = brush.empty() ? x.domain() : brush.extent();
         x.domain(newDomain);
         log(newDomain);
-        //main.select("path").attr("d", line);
+        main.selectAll("path.line").attr("d", line);
+        main.selectAll("path.line2").attr("d", ratioLine);
         main.select(".x.axis").call(xAxis);
     }
 
